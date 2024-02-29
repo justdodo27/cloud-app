@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, case
 import models
@@ -97,3 +97,25 @@ def food_nutrient_stats(db: Session = Depends(get_db)):
     }
 
     return stats
+
+
+def calculate_nutrient_score(food_item: models.FoodItem):
+    # Simple scoring example: prioritize protein and fiber, penalize high calories and saturated fats
+    score = (food_item.protein_g * 2 + food_item.fiber_g * 2) - (food_item.energy_kcal * 0.1 + food_item.saturated_fats_g * 2)
+    return score
+
+
+@app.get("/healthy-foods/", response_model=List[schemas.FoodItemWithScoreSchema])
+def get_healthy_foods(skip: int = Query(default=0, ge=0), limit: int = Query(default=10, ge=1), db: Session = Depends(get_db)):
+    food_items = db.query(models.FoodItem).all()
+    
+    # Calculate nutrient score for each food item
+    for food_item in food_items:
+        food_item.nutrient_score = calculate_nutrient_score(food_item)
+    
+    # Sort food items based on their nutrient score, higher is better
+    sorted_food_items = sorted(food_items, key=lambda x: x.nutrient_score, reverse=True)
+    
+    paginated_food_items = sorted_food_items[skip: skip + limit]
+    
+    return paginated_food_items

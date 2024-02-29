@@ -77,3 +77,10 @@ class FoodItemSchema(FoodItemCreate):
 
     class Config:
         from_attributes = True
+
+
+class FoodItemWithScoreSchema(FoodItemSchema):
+    nutrient_score: float
+
+    class Config:
+        from_attributes = True
