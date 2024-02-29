@@ -25,6 +25,8 @@
 
 - **GET** `/object/`
     - `name` - required parameter, part of the name to filter by
+    - `skip` - optional parameter, number of records to skip (default=0)
+    - `limit` - optional parameter, number of records to return (default=100)
 
     ```sh
     curl 'http://localhost:8000/object/?name=apple'
