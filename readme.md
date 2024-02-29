@@ -1,3 +1,14 @@
+## Start the app locally
+- Start & build the app
+    ```sh
+    docker compose up --build
+    ```
+    
+- Clean docker junk
+    ```sh
+    docker compose down -v
+    ```
+
 ## Endpoints Documentation
 
 ### Fetch All Records
