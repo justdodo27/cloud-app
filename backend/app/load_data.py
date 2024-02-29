@@ -1,5 +1,5 @@
 import csv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from models import Base, FoodItem
 import os
@@ -8,6 +8,12 @@ DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/d
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+def db_activate_library():
+    db = SessionLocal()
+    db.execute(text('CREATE EXTENSION IF NOT EXISTS pg_trgm'))
+    db.commit()
+
 
 def load_data(csv_file_path):
     db = SessionLocal()
@@ -55,6 +61,7 @@ def load_data(csv_file_path):
 flag_file_path = '/data/data_load_complete.flag'
 
 if __name__ == '__main__':
+    db_activate_library()
     # Check if the flag file exists
     if not os.path.exists(flag_file_path):
         csv_file_path = '/data/cleaned_ingredients.csv'

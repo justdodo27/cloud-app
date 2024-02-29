@@ -23,11 +23,14 @@ def read_food_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
 
 
 @app.get("/object/", response_model=List[schemas.FoodItemSchema])
-def read_food_item_by_name(name: str, db: Session = Depends(get_db)):
-    food_item = db.query(models.FoodItem).filter(models.FoodItem.descrip.contains(name)).all()
-    if food_item is None:
+def read_food_item_by_name(name: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    food_items = db.query(models.FoodItem)\
+                   .filter(models.FoodItem.descrip.match(name))\
+                   .order_by(func.similarity(models.FoodItem.descrip, name).desc())\
+                   .offset(skip).limit(limit).all()
+    if not food_items:
         raise HTTPException(status_code=404, detail="Food item not found")
-    return food_item
+    return food_items
 
 
 @app.post("/object/", response_model=schemas.FoodItemSchema)
