@@ -12,8 +12,7 @@ Base = declarative_base()
 class FoodItem(Base):
     __tablename__ = "food_items"
 
-    id = Column(Integer, primary_key=True, index=True)
-    ndb_no = Column(String, unique=True, index=True)
+    ndb_no = Column(String, primary_key=True, index=True)
     descrip = Column(String)
     energy_kcal = Column(Float)
     protein_g = Column(Float)
