@@ -104,3 +104,44 @@
         }
     }
     ```
+
+- **GET** `/healthy-foods/`
+    - `skip` (optional): The number of records to skip before starting to collect the result set. Defaults to `0`.
+    - `limit` (optional): The maximum number of records to return. Defaults to `10`.
+    
+    Retrieves a list of food items considered healthy based on a simple nutrient scoring system, which prioritizes foods high in protein and fiber but lower in calories and saturated fats. Results are sorted by their nutrient score in descending order, allowing the top healthiest foods to be listed first.
+
+    ```sh
+    curl 'http://localhost:8000/healthy-foods/?skip=0&limit=10'
+    ```
+    
+    ### Response Example
+
+    ```json
+    [
+        {
+            "ndb_no": "A1",
+            "descrip": "Spinach, raw",
+            "energy_kcal": 23,
+            "protein_g": 2.9,
+            "fat_g": 0.4,
+            "carb_g": 3.6,
+            "fiber_g": 2.2,
+            "saturated_fats_g": 0.063,
+            ...
+            "nutrient_score": 25.7
+        },
+        {
+            "ndb_no": "B2",
+            "descrip": "Chicken breast, grilled",
+            "energy_kcal": 165,
+            "protein_g": 31,
+            "fat_g": 3.6,
+            "carb_g": 0,
+            "fiber_g": 0,
+            "saturated_fats_g": 1,
+            ...
+            "nutrient_score": 28.5
+        }
+    ]
+    ```
