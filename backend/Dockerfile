@@ -18,8 +18,6 @@ RUN apt-get update && apt-get install -y netcat-traditional && rm -rf /var/lib/a
 WORKDIR /
 COPY ./entrypoint.sh .
 
-RUN chmod +x entrypoint.sh
 WORKDIR /app
 
-ENTRYPOINT [ "/entrypoint.sh" ]
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--reload"]
