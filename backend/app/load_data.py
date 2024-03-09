@@ -57,19 +57,3 @@ def load_data(csv_file_path):
             db.add(food_item)
             db.commit()
     db.close()
-
-flag_file_path = '/data/data_load_complete.flag'
-
-if __name__ == '__main__':
-    db_activate_library()
-    # Check if the flag file exists
-    if not os.path.exists(flag_file_path):
-        csv_file_path = '/data/cleaned_ingredients.csv'
-        load_data(csv_file_path)
-        # Create a flag file to indicate completion
-        with open(flag_file_path, 'w') as f:
-            f.write('Data load complete')
-        print("Data loaded successfully.")
-    else:
-        print("Data already loaded. Skipping.")
-

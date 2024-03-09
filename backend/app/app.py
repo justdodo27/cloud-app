@@ -1,3 +1,8 @@
+from contextlib import asynccontextmanager
+import os
+
+from load_data import load_data
+
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, case
@@ -6,7 +11,24 @@ import schemas
 from uuid import uuid4
 from typing import List
 
-app = FastAPI()
+flag_file_path = '/data/data_load_complete.flag'
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if not os.path.exists(flag_file_path):
+        csv_file_path = '/data/cleaned_ingredients.csv'
+        load_data(csv_file_path)
+        # Create a flag file to indicate completion
+        with open(flag_file_path, 'w') as f:
+            f.write('Data load complete')
+        print("Data loaded successfully.")
+    else:
+        print("Data already loaded. Skipping.")
+    yield
+    print("Startup complete")
+
+
+app = FastAPI(lifespan=lifespan)
 
 def get_db():
     db = models.SessionLocal()
