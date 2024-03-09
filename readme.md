@@ -4,11 +4,6 @@
     docker compose up --build
     ```
 
-- Load the data
-    ```sh
-    docker compose exec backend python load_data.py
-    ``` 
-
 - Clean docker junk
     ```sh
     docker compose down -v
