@@ -69,10 +69,10 @@ watch(() => foodName.value, async (newText) => {
 </script>
 
 <template>
-  <div>
+  <div class="w-full flex flex-col justify-center">
     <span class="mr-3">Search</span>
     <input type="text" v-model="foodName" class="p-2 mb-10">
-    <div class="flex flex-wrap justify-center">
+    <div class="flex flex-wrap justify-center w-full">
       <FoodItem :food="food" v-for="food in foodItems" :key="food.ndb_no" />
     </div>
     <Paginator :page="page" :size="size" @sizeChange="(value) => size = value" @next="page++" @prev="page--"/>

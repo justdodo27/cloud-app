@@ -100,7 +100,7 @@ zinc_mg
   <div class="bg-slate-500 p-1 m-2 w-1/4 max-h-20">
     <div class="font-bold capitalize truncate h-1/2">{{ food.descrip }}</div>
     <div class="flex">
-        <div>{{ food.energy_kcal }}kcal</div>
+        <div>{{ Math.round(food.energy_kcal) }}kcal</div>
     </div>
   </div>
 </template>
