@@ -1,11 +1,12 @@
 from contextlib import asynccontextmanager
 import os
 
-from load_data import load_data
+from load_data import load_data, db_activate_library
 
 from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import func, case
+from sqlalchemy import func, case, or_
 import models
 import schemas
 from uuid import uuid4
@@ -15,6 +16,7 @@ flag_file_path = '/data/data_load_complete.flag'
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    db_activate_library()
     if not os.path.exists(flag_file_path):
         csv_file_path = '/data/cleaned_ingredients.csv'
         load_data(csv_file_path)
@@ -30,6 +32,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 def get_db():
     db = models.SessionLocal()
     try:
@@ -39,15 +49,18 @@ def get_db():
 
 
 @app.get("/objects/", response_model=List[schemas.FoodItemSchema])
-def read_food_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_food_items(skip: int = 0, limit: int = None, db: Session = Depends(get_db)):
     food_items = db.query(models.FoodItem).offset(skip).limit(limit).all()
     return food_items
 
 
 @app.get("/object/", response_model=List[schemas.FoodItemSchema])
-def read_food_item_by_name(name: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_food_item_by_name(name: str, skip: int = 0, limit: int = None, db: Session = Depends(get_db)):
     food_items = db.query(models.FoodItem)\
-                   .filter(models.FoodItem.descrip.match(name))\
+                   .filter(or_(
+                       models.FoodItem.descrip.match(name),
+                       models.FoodItem.descrip.ilike(f"%{name}%"),
+                    ))\
                    .order_by(func.similarity(models.FoodItem.descrip, name).desc())\
                    .offset(skip).limit(limit).all()
     if not food_items:
