@@ -24,7 +24,13 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db/food
-  # frontend:
-    # Define frontend service here
+  frontend:
+    build: ./frontend
+    volumes:
+      - node_modules:/app/node_modules
+      - ./frontend/app:/app
+    ports:
+      - "5173:5173"
 volumes:
   postgres_data:
+  node_modules:
