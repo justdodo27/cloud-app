@@ -1,10 +1,11 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import {onClickOutside} from '@vueuse/core'
 
 const props = defineProps({
   isOpen: Boolean,
   food: Object,
+  noEdit: Boolean,
 })
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL ? import.meta.env.VITE_BACKEND_URL : 'http://0.0.0.0:8000';
@@ -15,7 +16,7 @@ const target = ref(null)
 onClickOutside(target, ()=>emit('modal-close'))
 
 const getFoodLabels = () => {
-    return Object.entries(props.food).filter((item) => item[0] !== "descrip" && item[0] !== "ndb_no")
+    return Object.entries(props.food).filter((item) => item[0] !== "descrip" && item[0] !== "ndb_no" && item[0] !== "nutrient_score")
 }
 
 const editMode = ref(false)
@@ -30,6 +31,10 @@ const editFood = async () => {
     emit('modal-close')
 }
 
+watch(() => editMode.value, (newValue) => {
+  editData.value = props.food
+})
+
 </script>
 
 <template>
@@ -40,7 +45,7 @@ const editFood = async () => {
             <div class="font-normal absolute left-0 top-0 bg-slate-800 p-1 rounded-tl-sm">{{ food.ndb_no }}</div>
             <div class="font-bold capitalize" v-if="!editMode">{{ food.descrip }}</div>
             <input type="text" v-else v-model="editData.descrip" class="px-1">
-            <div class="flex font-normal text-sm gap-1 items-center absolute right-0 top-0 p-2 bg-slate-800 rounded-tr-sm">
+            <div v-if="food.nutrient_score === undefined" class="flex font-normal text-sm gap-1 items-center absolute right-0 top-0 p-2 bg-slate-800 rounded-tr-sm">
                 <label for="edit" class="select-none">Edit</label>
                 <input type="checkbox" name="edit" id="edit" v-model="editMode">
             </div>
@@ -56,11 +61,17 @@ const editFood = async () => {
             </div>
             
           </div>
+          <div v-if="food.nutrient_score !== undefined" class="flex justify-center space-x-3 mt-3">
+            <div class="font-bold">Nutrient Score</div>
+            <div>
+              {{ Math.round((food.nutrient_score + Number.EPSILON) * 100) / 100 }}
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <slot name="footer">
-            <div>
-              <button :disabled="!editMode" @click.stop="editFood()">Save edit</button>
+            <div v-if="food.nutrient_score === undefined">
+              <button :disabled="!editMode || !!noEdit" @click.stop="editFood()">Save edit</button>
             </div>
           </slot>
         </div>
