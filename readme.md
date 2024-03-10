@@ -145,3 +145,28 @@
         }
     ]
     ```
+
+## Kubernetes
+
+1. Build docker images
+```sh
+cd frontend
+docker build -t frontend-image:latest . --no-cache --build-arg VUE_APP_BACKEND_URL=http://localhost:30800
+```
+
+```sh
+cd backend
+docker build -t backend-image:latest . --no-cache
+```
+
+2. Apply all kubernetes yaml's
+```sh
+kubectl apply -f kubernetes/persistent-volume.yaml
+kubectl apply -f kubernetes/persistent-volume-claim.yaml
+kubectl apply -f kubernetes/db.yaml
+kubectl apply -f kubernetes/db-service.yaml
+kubectl apply -f kubernetes/frontend.yaml
+kubectl apply -f kubernetes/frontend-service.yaml
+kubectl apply -f kubernetes/backend.yaml
+kubectl apply -f kubernetes/backend-service.yaml
+```

@@ -8,11 +8,12 @@ const foodItems = ref([])
 const page = ref(1)
 const size = ref(10)
 const foodName = ref('')
+const backendUrl = import.meta.env.VITE_BACKEND_URL ? import.meta.env.VITE_BACKEND_URL : 'http://0.0.0.0:8000';
 
 onMounted(async () => {
-  let response = await fetch(`http://0.0.0.0:8000/objects/?skip=${page.value - 1}&limit=${size.value}`)
+  let response = await fetch(`${backendUrl}/objects/?skip=${page.value - 1}&limit=${size.value}`)
   foodItems.value = await response.json()
-})
+});
 
 watch(() => size.value, async (newSize) => {
   let filter = `?`
@@ -27,9 +28,9 @@ watch(() => size.value, async (newSize) => {
     filter += `skip=${(page.value-1) * newSize}&limit=${newSize}`
   }
 
-  let response = await fetch(`http://0.0.0.0:8000/${search}/${filter}`)
+  let response = await fetch(`${backendUrl}/${search}/${filter}`)
   foodItems.value = await response.json()
-})
+});
 
 watch(() => page.value, async (newPage) => {
   let filter = `?`
@@ -45,9 +46,9 @@ watch(() => page.value, async (newPage) => {
   }
 
   
-  let response = await fetch(`http://0.0.0.0:8000/${search}/${filter}`)
+  let response = await fetch(`${backendUrl}/${search}/${filter}`)
   foodItems.value = await response.json()
-})
+});
 
 watch(() => foodName.value, async (newText) => {
   let filter = `?`
@@ -63,9 +64,9 @@ watch(() => foodName.value, async (newText) => {
   }
 
   
-  let response = await fetch(`http://0.0.0.0:8000/${search}/${filter}`)
-  foodItems.value = await response.json()
-})
+  let response = await fetch(`${backendUrl}/${search}/${filter}`)
+  foodItems.value = await response.json();
+});
 </script>
 
 <template>

@@ -19,7 +19,10 @@ async def lifespan(app: FastAPI):
     db_activate_library()
     if not os.path.exists(flag_file_path):
         csv_file_path = '/data/cleaned_ingredients.csv'
-        load_data(csv_file_path)
+        try:
+            load_data(csv_file_path)
+        except Exception:
+            pass
         # Create a flag file to indicate completion
         with open(flag_file_path, 'w') as f:
             f.write('Data load complete')
