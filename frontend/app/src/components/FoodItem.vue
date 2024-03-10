@@ -97,7 +97,7 @@ zinc_mg
 </script>
 
 <template>
-  <div class="bg-slate-500 p-1 m-2 w-1/4 max-h-20">
+  <div class="bg-slate-500 w-full max-h-20 rounded p-3 mb-3">
     <div class="font-bold capitalize truncate h-1/2">{{ food.descrip }}</div>
     <div class="flex">
         <div>{{ Math.round(food.energy_kcal) }}kcal</div>

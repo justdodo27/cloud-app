@@ -1,6 +1,7 @@
 <script setup>
 import Paginator from './components/Paginator.vue'
 import FoodItem from './components/FoodItem.vue'
+import Dialog from './components/Dialog.vue'
 import { ref, onMounted, watch } from 'vue'
 import {} from './style.css'
 
@@ -9,6 +10,21 @@ const page = ref(1)
 const size = ref(10)
 const foodName = ref('')
 const backendUrl = import.meta.env.VITE_BACKEND_URL ? import.meta.env.VITE_BACKEND_URL : 'http://0.0.0.0:8000';
+const showDialog = ref(false)
+const activeFood = ref(null)
+
+function closeDialog() {
+  showDialog.value = false
+}
+
+function openDialog(food) {
+  activeFood.value = food
+  showDialog.value = true
+}
+
+const submitHandler = ()=>{
+  //here you do whatever
+}
 
 onMounted(async () => {
   let response = await fetch(`${backendUrl}/objects/?skip=${page.value - 1}&limit=${size.value}`)
@@ -70,14 +86,23 @@ watch(() => foodName.value, async (newText) => {
 </script>
 
 <template>
-  <div class="w-full flex flex-col justify-center">
-    <span class="mr-3">Search</span>
-    <input type="text" v-model="foodName" class="p-2 mb-10">
-    <div class="flex flex-wrap justify-center w-full">
-      <FoodItem :food="food" v-for="food in foodItems" :key="food.ndb_no" />
+  <div class="w-full flex flex-col justify-center items-center">
+    <span class="mb-3 font-medium text-2xl">Search</span>
+    <input type="text" v-model="foodName" class="p-2 mb-10 rounded w-1/2">
+    <div class="w-full columns-2 gap-8">
+      <FoodItem v-if="foodItems && foodItems.length > 0" :food="food" v-for="food in foodItems" :key="food.ndb_no" @click="openDialog(food)" />
     </div>
-    <Paginator :page="page" :size="size" @sizeChange="(value) => size = value" @next="page++" @prev="page--"/>
+    <Transition name="fade">
+      <div v-if="!(foodItems && foodItems.length > 0)" class="font-bold w-full">
+        Food not found 😭
+      </div>
+    </Transition>
+    <Transition name="fade">
+      <Paginator v-if="foodItems && foodItems.length > 0" :page="page" :size="size" @sizeChange="(value) => size = value" @next="page++" @prev="page--"/>
+    </Transition>
   </div>
+  <Dialog :isOpen="showDialog" @modal-close="closeDialog" @submit="submitHandler" :food="activeFood" name="first-modal">
+  </Dialog>
 </template>
 
 <style scoped>
@@ -92,5 +117,15 @@ watch(() => foodName.value, async (newText) => {
 }
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
