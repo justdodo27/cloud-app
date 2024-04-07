@@ -170,3 +170,19 @@ kubectl apply -f kubernetes/frontend-service.yaml
 kubectl apply -f kubernetes/backend.yaml
 kubectl apply -f kubernetes/backend-service.yaml
 ```
+
+## Terraform
+
+```sh
+terrafom init
+terraform plan
+terraform apply # wait for about 8-10minutes
+
+
+# on gcloud ssh
+# copy and run runapp.sh
+gcloud container clusters get-credentials moj-klast-gke --zone us-east1-b --project local-passage-419615
+cat > runapp.sh
+# paste the file content and press enter, ctrl + c
+./runapp.sh
+```
