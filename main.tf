@@ -12,7 +12,7 @@ resource "google_container_cluster" "gke_cluster" {
 
   node_pool {
     name       = "default-pool"
-    node_count = 10
+    node_count = 8
 
     node_config {
       machine_type = "e2-micro"
