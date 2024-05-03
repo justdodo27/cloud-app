@@ -8,7 +8,7 @@ defineProps({
 
 <template>
   <div class="bg-slate-500 w-full max-h-20 rounded px-3 py-4 mb-3 relative">
-    <div class="absolute w-[50px] text-[12px] top-0 left-0 px-1 bg-slate-600 rounded-tl">{{ food.ndb_no }}</div>
+    <div class="absolute w-[50px] h-[20px] text-[12px] top-0 left-0 px-1 bg-slate-600 rounded-tl text-ellipsis overflow-hidden">{{ food.ndb_no }}</div>
     <div class="font-bold capitalize truncate h-1/2">{{ food.descrip }}</div>
     <div class="flex justify-between">
         <div>{{ Math.round((food.energy_kcal + Number.EPSILON) * 100) / 100 }} kcal</div>

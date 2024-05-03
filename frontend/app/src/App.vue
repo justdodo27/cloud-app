@@ -19,10 +19,47 @@ const healthyListPage = ref(1)
 const healthyListSize = ref(10)
 
 const showDialog = ref(false)
+const addProduct = ref(false)
 const activeFood = ref(null)
 
 function closeDialog() {
   showDialog.value = false
+  addProduct.value = false
+}
+
+function addDialog() {
+  addProduct.value = true
+  openDialog({
+    'calcium_mg': 0.0,
+    'carb_g': 0.0,
+    'copper_mcg': 0.0,
+    'descrip': "New product",
+    'energy_kcal': 0.0,
+    'fat_g': 0.0,
+    'fiber_g': 0.0,
+    'folate_mcg': 0.0,
+    'iron_mg': 0.0,
+    'magnesium_mg': 0.0,
+    'manganese_mg': 0.0,
+    'ndb_no': null,
+    'niacin_mg': 0.0,
+    'phosphorus_mg': 0.0,
+    'potassium_mg': 0.0,
+    'protein_g': 0.0,
+    'riboflavin_mg': 0.0,
+    'saturated_fats_g': 0.0,
+    'selenium_mcg': 0.0,
+    'sodium_mg': 0.0,
+    'sugar_g': 0.0,
+    'thiamin_mg': 0.0,
+    'vita_mcg': 0.0,
+    'vitb6_mg': 0.0,
+    'vitb12_mcg': 0.0,
+    'vitc_mg': 0.0,
+    'vitd2_mcg': 0.0,
+    'vite_mg': 0.0,
+    'zinc_mg': 0.0
+  })
 }
 
 function openDialog(food) {
@@ -43,7 +80,6 @@ onMounted(async () => {
 
   let healthy = await fetch(`${backendUrl}/healthy-foods/?skip=${healthyListPage.value - 1}&limit=${healthyListSize.value}`)
   healthyList.value = await healthy.json()
-  console.log(healthyList.value)
 });
 
 watch(() => size.value, async (newSize) => {
@@ -126,10 +162,11 @@ watch(() => foodName.value, async (newText) => {
 </script>
 
 <template>
-  <nav class="w-full fixed bg-slate-800 flex space-x-2 justify-center">
+  <nav class="w-full fixed bg-slate-800 flex space-x-2 justify-center p-2 z-50">
     <a href="#food_list" class="p-2 hover:text-slate-400 hover:cursor-pointer">Food List</a>
     <a href="#food_stats" class="p-2 hover:text-slate-400 hover:cursor-pointer">Food Statistics</a>
     <a href="#healthy_food_list" class="p-2 hover:text-slate-400 hover:cursor-pointer">Healthy Food List</a>
+    <button class="p-2" @click="addDialog()">+ Add new product</button>
   </nav>
   <div class="w-full flex flex-col justify-center items-center p-6 mt-20" id="food_list">
     <span class="mb-3 font-medium text-3xl">Search Food List</span>
@@ -146,7 +183,7 @@ watch(() => foodName.value, async (newText) => {
       <Paginator v-if="foodItems && foodItems.length > 0" :page="page" :size="size" @sizeChange="(value) => size = value" @next="page++" @prev="page--"/>
     </Transition>
   </div>
-  <Dialog :isOpen="showDialog" @modal-close="closeDialog" @submit="submitHandler" :food="activeFood" name="first-modal">
+  <Dialog :isOpen="showDialog" @modal-close="closeDialog" @submit="submitHandler" :add="addProduct" :food="activeFood" name="first-modal">
   </Dialog>
   <div class="w-full flex flex-col justify-center items-center p-6 mt-10" id="food_stats">
     <div class="font-bold text-3xl mb-4">Food Statistics</div>

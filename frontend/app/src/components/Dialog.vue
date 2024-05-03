@@ -6,10 +6,42 @@ const props = defineProps({
   isOpen: Boolean,
   food: Object,
   noEdit: Boolean,
+  add: Boolean
 })
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL ? import.meta.env.VITE_BACKEND_URL : 'http://0.0.0.0:8000';
+const emptyFoodObject = {
+  'calcium_mg': 0.0,
+  'carb_g': 0.0,
+  'copper_mcg': 0.0,
+  'descrip': "New product",
+  'energy_kcal': 0.0,
+  'fat_g': 0.0,
+  'fiber_g': 0.0,
+  'folate_mcg': 0.0,
+  'iron_mg': 0.0,
+  'magnesium_mg': 0.0,
+  'manganese_mg': 0.0,
+  'ndb_no': null,
+  'niacin_mg': 0.0,
+  'phosphorus_mg': 0.0,
+  'potassium_mg': 0.0,
+  'protein_g': 0.0,
+  'riboflavin_mg': 0.0,
+  'saturated_fats_g': 0.0,
+  'selenium_mcg': 0.0,
+  'sodium_mg': 0.0,
+  'sugar_g': 0.0,
+  'thiamin_mg': 0.0,
+  'vita_mcg': 0.0,
+  'vitb6_mg': 0.0,
+  'vitb12_mcg': 0.0,
+  'vitc_mg': 0.0,
+  'vitd2_mcg': 0.0,
+  'vite_mg': 0.0,
+  'zinc_mg': 0.0
+}
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL ? import.meta.env.VITE_BACKEND_URL : 'http://0.0.0.0:8000';
 const emit = defineEmits(["modal-close"])
 
 const target = ref(null)
@@ -20,10 +52,20 @@ const getFoodLabels = () => {
 }
 
 const editMode = ref(false)
-const editData = ref(props.food)
+const editData = ref(emptyFoodObject)
 const editFood = async () => {
     let response = await fetch(`${backendUrl}/object/${editData.value.ndb_no}`, {
         method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editData.value)
+    })
+    editMode.value = false
+    emit('modal-close')
+}
+
+const addFood = async () => {
+    let response = await fetch(`${backendUrl}/object/`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editData.value)
     })
@@ -43,9 +85,9 @@ watch(() => editMode.value, (newValue) => {
       <div class="modal-container bg-slate-600 rounded p-3 relative" ref="target">
         <div class="modal-header font-bold text-xl mb-2 flex justify-center gap-3">
             <div class="font-normal absolute left-0 top-0 bg-slate-800 p-1 rounded-tl-sm">{{ food.ndb_no }}</div>
-            <div class="font-bold capitalize" v-if="!editMode">{{ food.descrip }}</div>
+            <div class="font-bold capitalize" v-if="!editMode && !add">{{ food.descrip }}</div>
             <input type="text" v-else v-model="editData.descrip" class="px-1">
-            <div v-if="food.nutrient_score === undefined" class="flex font-normal text-sm gap-1 items-center absolute right-0 top-0 p-2 bg-slate-800 rounded-tr-sm">
+            <div v-if="food.nutrient_score === undefined && !add" class="flex font-normal text-sm gap-1 items-center absolute right-0 top-0 p-2 bg-slate-800 rounded-tr-sm">
                 <label for="edit" class="select-none">Edit</label>
                 <input type="checkbox" name="edit" id="edit" v-model="editMode">
             </div>
@@ -54,7 +96,7 @@ watch(() => editMode.value, (newValue) => {
           <div class="columns-3 gap-3">
             <div class="columns-2 gap-2 mb-1" v-for="[label, value] in getFoodLabels()" :key="label">
                 <div class="capitalize text-left font-bold">{{ label }}</div>
-                <div class="text-right" v-if="!editMode">{{ Math.round((value + Number.EPSILON) * 100) / 100 }}</div>
+                <div class="text-right" v-if="!editMode && !add">{{ Math.round((value + Number.EPSILON) * 100) / 100 }}</div>
                 <div v-else class="flex justify-end">
                     <input type="number" :name="label" v-model="editData[label]" :id="label" class="w-[60%] rounded px-1">
                 </div>
@@ -71,7 +113,8 @@ watch(() => editMode.value, (newValue) => {
         <div class="modal-footer">
           <slot name="footer">
             <div v-if="food.nutrient_score === undefined">
-              <button :disabled="!editMode || !!noEdit" @click.stop="editFood()">Save edit</button>
+              <button v-if="!add" :disabled="!editMode || !!noEdit" @click.stop="editFood()">Save edit</button>
+              <button v-else :disabled="!add" @click.stop="addFood()">Add +</button>
             </div>
           </slot>
         </div>
