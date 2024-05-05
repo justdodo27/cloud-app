@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: justdodo/frontend-image:latest
+        image: justdodo/frontend-image:v1.1
         env:
         - name: VUE_APP_BACKEND_URL
           value: "http://localhost:30800"
