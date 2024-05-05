@@ -23,9 +23,11 @@ spec:
           value: postgres
         - name: POSTGRES_PASSWORD
           value: postgres
+        - name: PGDATA
+          mountPath: /var/lib/postgresql/data/pgdata
         volumeMounts:
         - name: db-storage
-          mountPath: /var/lib/postgresql/data
+          mountPath: /var/lib/postgresql
       volumes:
       - name: db-storage
         persistentVolumeClaim:
